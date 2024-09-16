@@ -35,21 +35,5 @@ namespace KSR_Backend
                     .ToList();
             }
         }
-
-        //private static string RoomTypeMatch(int typeId)
-        //{
-        //    using (var context = new ApiContext())
-        //    {
-        //        return context.FindById(typeId).Name;
-        //    }
-        //}
-
-        //private static int RoomTypeMatch(string typeName)
-        //{
-        //    using (var context = new ApiContext())
-        //    {
-        //        return context.FindByName(typeName);
-        //    }
-        //}
     }
 }

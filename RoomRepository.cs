@@ -10,6 +10,13 @@ namespace KSR_Backend
 {
     internal class RoomRepository : IRoomsDao
     {
+        public RoomRepository() {
+            this.Save(new RoomDisplay() { Id = 1, Name = "example", Status = "free", TypeId = 1 });
+            this.Save(new RoomDisplay() { Id = 2, Name = "example2", Status = "free", TypeId = 1 });
+            this.Save(new RoomDisplay() { Id = 2, Name = "example3", Status = "occupied", TypeId = 1 });
+
+        }
+
         public ICollection<RoomDisplay> GetAll()
         {
             using (var context = new ApiContext())
@@ -25,7 +32,7 @@ namespace KSR_Backend
             using (var context = new ApiContext())
             {
                 return context.Rooms
-                    .Select (r => new RoomDisplay() { Id = r.RoomId, Name = r.Name, Status = r.Status, TypeId = r.RoomType })
+                    .Select(r => new RoomDisplay() { Id = r.RoomId, Name = r.Name, Status = r.Status, TypeId = r.RoomType })
                     .Where(r => r.Id == id)
                     .First();
             }
@@ -37,30 +44,33 @@ namespace KSR_Backend
             {
                 try
                 {
-                    if (context.Rooms
-                    .Select(r => new RoomDisplay() { Id = r.RoomId, Name = r.Name, Status = r.Status, TypeId = r.RoomType })
-                    .Where(r => r.Id == room.Id)
-                    .First() == null)
+                    var temp = context.Rooms.Find(room.Id);
+                    if (temp == null)
                     {
                         context.Rooms.Add(new Room() { RoomId = room.Id, Name = room.Name, Status = room.Status, RoomType = room.TypeId });
-                    }
+                    } 
                     else
                     {
+                        context.Entry(temp).State = EntityState.Detached;
                         context.Rooms.Update(new Room() { RoomId = room.Id, Name = room.Name, Status = room.Status, RoomType = room.TypeId });
                     }
+                    
 
                     if(context.SaveChanges() > 0)
                     {
+                        Console.WriteLine("saved");
                         return true;
                     } 
                     else
                     {
+                        Console.WriteLine("not saved");
                         return false;
                     }
                     
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message.ToString());
                     return false;
                 }
                 //primary key behavior?
@@ -85,7 +95,11 @@ namespace KSR_Backend
                         return false;
                     }
                 }
-                catch(Exception) { return false; }
+                catch(Exception ex) 
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                    return false; 
+                }
             }
         }
 

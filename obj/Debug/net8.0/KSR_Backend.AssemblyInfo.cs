@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KSR_Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f9b19e451d34a2b989f7200e0af8ba93f2ebe3ac")]
 [assembly: System.Reflection.AssemblyProductAttribute("KSR_Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KSR_Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

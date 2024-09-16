@@ -81,7 +81,6 @@ namespace KSR_Backend
 
         static void PrintStatus()
         {
-            Console.Clear();
             Console.WriteLine(Utils.printTimestamp() + "Process initialized. Press ESC to quit");
         }
 

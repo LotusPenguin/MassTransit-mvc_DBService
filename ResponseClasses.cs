@@ -20,11 +20,11 @@ namespace KSR_Backend
 
     internal class RoomsResponse : IRoomsResponse
     {
-        public object Message { get; set; }
+        public string Text { get; set; }
 
-        public RoomsResponse(object message)
+        public RoomsResponse(string message)
         {
-            Message = message;
+            Text = message;
         }
     }
 

@@ -37,3 +37,5 @@ C:\Users\Pingwin\source\repos\KSR_Backend\bin\Debug\net8.0\RabbitMQ.Client.dll
 C:\Users\Pingwin\source\repos\KSR_Backend\bin\Debug\net8.0\MessageTypes.dll
 C:\Users\Pingwin\source\repos\KSR_Backend\bin\Debug\net8.0\MessageTypes.pdb
 C:\Users\Pingwin\source\repos\KSR_Backend\obj\Debug\net8.0\KSR_Back.7EF7AD74.Up2Date
+C:\Users\Pingwin\source\repos\KSR_Backend\obj\Debug\net8.0\KSR_Backend.sourcelink.json
+C:\Users\Pingwin\source\repos\KSR_Backend\bin\Debug\net8.0\Newtonsoft.Json.dll

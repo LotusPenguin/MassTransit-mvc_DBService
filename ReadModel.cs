@@ -9,7 +9,7 @@ namespace ReadModel
     public interface IRoomsDao
     {
         ICollection<RoomDisplay> GetAll();
-        RoomDisplay FindById(int id);
+        RoomDisplay? FindById(int id);
     }
 
     public interface IRoomTypesDao

@@ -14,9 +14,7 @@ namespace KSR_Backend
         public async Task Consume(ConsumeContext<IRoomsQuery> context)
         {
             Console.WriteLine(Utils.printTimestamp() + "RoomsQuery");
-            //query do bazy
             var result = JsonSerializer.Serialize(RoomRepository.GetAll());
-            //return SendEndpoint.Send(new RoomsResponse(result));
             await context.RespondAsync(new RoomsResponse(result));
         }
     }

@@ -5,16 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ReadModel;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace KSR_Backend
 {
     internal class RoomRepository : IRoomsDao
     {
         public RoomRepository() {
+            //debug
             this.Save(new RoomDisplay() { Id = 1, Name = "example", Status = "free", TypeId = 1 });
             this.Save(new RoomDisplay() { Id = 2, Name = "example2", Status = "free", TypeId = 1 });
             this.Save(new RoomDisplay() { Id = 2, Name = "example3", Status = "occupied", TypeId = 1 });
-
         }
 
         public ICollection<RoomDisplay> GetAll()
@@ -27,14 +28,23 @@ namespace KSR_Backend
             }
         }
 
-        public RoomDisplay FindById(int id)
+        public RoomDisplay? FindById(int id)
         {
             using (var context = new ApiContext())
             {
-                return context.Rooms
-                    .Select(r => new RoomDisplay() { Id = r.RoomId, Name = r.Name, Status = r.Status, TypeId = r.RoomType })
-                    .Where(r => r.Id == id)
-                    .First();
+                
+                Room? temp = context.Rooms.SingleOrDefault(x => x.RoomId == id);
+
+                Console.WriteLine(temp != null);
+                Console.WriteLine(id.ToString());
+
+                if (temp != null) {
+                    return new RoomDisplay() { Id = temp.RoomId, Name = temp.Name, Status = temp.Status, TypeId = temp.RoomType };
+                }
+                else
+                {
+                    return null;
+                }
             }
         }
         
@@ -102,7 +112,5 @@ namespace KSR_Backend
                 }
             }
         }
-
-
     }
 }

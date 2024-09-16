@@ -9,70 +9,68 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KSR_Backend
 {
-    public class CommandData : SagaStateMachineInstance
-    {
-        private Uri _responseAddress = new("http://localhost");
-        public Uri ResponseAddress
-        {
-            get => _responseAddress;
-            set { _responseAddress = value; }
-        }
-        public Guid CorrelationId { get; set; }
-        public string CurrentState { get; set; }
-        public string SessionID { get; set; }
-        public int RoomID { get; set; }
-        public string RoomStatus { get; set; }
-        public Guid? TimeoutId { get; set; }
-    }
+    //public class CommandData : SagaStateMachineInstance
+    //{
+    //    private Uri _responseAddress = new("http://localhost");
+    //    public Uri ResponseAddress
+    //    {
+    //        get => _responseAddress;
+    //        set { _responseAddress = value; }
+    //    }
+    //    public Guid CorrelationId { get; set; }
+    //    public string CurrentState { get; set; }
+    //    public string SessionID { get; set; }
+    //    public int RoomID { get; set; }
+    //    public string RoomStatus { get; set; }
+    //    public Guid? TimeoutId { get; set; }
+    //}
 
-    public class CommandSaga : MassTransitStateMachine<CommandData> 
-    { 
-        public State Requested { get; private set; }
-        public Event<MessageTypes.IRoomStatusChangeRequest> StartEvent { get; private set; }
-        public Schedule<CommandData, MessageTypes.ITimeout> TO { get; private set; }
+    //public class CommandSaga : MassTransitStateMachine<CommandData> 
+    //{ 
+    //    public State Requested { get; private set; }
+    //    public Event<MessageTypes.IRoomStatusChangeRequest> StartEvent { get; private set; }
+    //    public Schedule<CommandData, MessageTypes.ITimeout> TO { get; private set; }
 
-        public CommandSaga() 
-        {
-            InstanceState(x => x.CurrentState);
+    //    public CommandSaga() 
+    //    {
+    //        InstanceState(x => x.CurrentState);
 
-            Event(() => StartEvent,
-                x => x.CorrelateBy(
-                    s => s.SessionID,
-                    ctx => ctx.Message.SessionID)
-                .SelectId(ctx => Guid.NewGuid()));
+    //        Event(() => StartEvent,
+    //            x => x.CorrelateBy(
+    //                s => s.SessionID,
+    //                ctx => ctx.Message.SessionID)
+    //            .SelectId(ctx => Guid.NewGuid()));
 
-            Schedule(() => TO,
-                x => x.TimeoutId,
-                x => { x.Delay = TimeSpan.FromSeconds(10); });
+    //        Schedule(() => TO,
+    //            x => x.TimeoutId,
+    //            x => { x.Delay = TimeSpan.FromSeconds(10); });
 
-            Initially(
-                When(StartEvent)
-                    .Then(ctx =>
-                    {
-                        ctx.Saga.SessionID = ctx.Message.SessionID;
-                        ctx.Saga.RoomID = ctx.Message.RoomID;
-                        ctx.Saga.RoomStatus = ctx.Message.RoomStatus;
-                        ctx.Saga.ResponseAddress = ctx.ResponseAddress;
-                    })
-                    .Schedule(TO, ctx => new Timeout() { CorrelationId = ctx.Saga.CorrelationId, ResponseAddress = ctx.Saga.ResponseAddress }, ctx =>
-                    {
-                        ctx.ResponseAddress = ctx.Message.ResponseAddress;
-                    })
-                    .Respond(ctx =>
-                    {
-                        
-
-                        return new RoomStatusChangeResponse()
-                        {
-                            CorrelationId = ctx.Saga.CorrelationId,
-                            RoomID = ctx.Saga.RoomID,
-                            RoomStatus = ctx.Saga.RoomStatus
-                        };
-                    })
-                    .Finalize()
-            );
-        }
-    }
+    //        Initially(
+    //            When(StartEvent)
+    //                .Then(ctx =>
+    //                {
+    //                    ctx.Saga.SessionID = ctx.Message.SessionID;
+    //                    ctx.Saga.RoomID = ctx.Message.RoomID;
+    //                    ctx.Saga.RoomStatus = ctx.Message.RoomStatus;
+    //                    ctx.Saga.ResponseAddress = ctx.ResponseAddress;
+    //                })
+    //                .Schedule(TO, ctx => new Timeout() { CorrelationId = ctx.Saga.CorrelationId, ResponseAddress = ctx.Saga.ResponseAddress }, ctx =>
+    //                {
+    //                    ctx.ResponseAddress = ctx.Message.ResponseAddress;
+    //                })
+    //                .RespondAsync(ctx =>
+    //                {
+    //                    return new RoomStatusChangeResponse()
+    //                    {
+    //                        CorrelationId = ctx.Saga.CorrelationId,
+    //                        RoomID = ctx.Saga.RoomID,
+    //                        RoomStatus = ctx.Saga.RoomStatus
+    //                    };
+    //                })
+    //                .Finalize()
+    //        );
+    //    }
+    //}
 
     internal class Program
     {
@@ -97,12 +95,19 @@ namespace KSR_Backend
 
             var roomRepository = new RoomRepository();
             var roomTypeRepository = new RoomTypeRepository();
-            var sagaRepository = new InMemorySagaRepository<CommandData>();
-            var commandMachine = new CommandSaga();
+            //var sagaRepository = new InMemorySagaRepository<CommandData>();
+            //var commandMachine = new CommandSaga();
 
-            QueryHandlerClass queryHandler = new QueryHandlerClass() { 
+            QueryHandlerClass queryHandler = new QueryHandlerClass() 
+            { 
                 RoomRepository = roomRepository, 
                 RoomTypeRepository = roomTypeRepository 
+            };
+
+            CommandHandlerClass commandHandler = new CommandHandlerClass()
+            {
+                RoomRepository = roomRepository,
+                RoomTypeRepository = roomTypeRepository
             };
 
             var commandBus = Bus.Factory.CreateUsingRabbitMq(sbc =>
@@ -114,9 +119,10 @@ namespace KSR_Backend
                 });
                 sbc.ReceiveEndpoint("commandqueue", ep =>
                 {
+                    
+                    ep.Instance(commandHandler);
                     //TODO: saga config
-                    //ep.Instance(commandHandler);
-                    ep.StateMachineSaga(commandMachine, sagaRepository);
+                    //ep.StateMachineSaga(commandMachine, sagaRepository);
                     ep.UseMessageRetry(r =>
                     {
                         r.Immediate(5);

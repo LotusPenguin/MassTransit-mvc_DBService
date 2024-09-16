@@ -30,7 +30,7 @@ namespace KSR_Backend
 
     internal class RoomStatusChangeResponse : IRoomStatusChangeResponse
     {
-        public int RoomID { get; set; }
+        public int RoomId { get; set; }
         public string RoomStatus { get; set; }
         public Guid CorrelationId { get; set; }
     }
